@@ -66,7 +66,7 @@ def process(inputs, ctx, **kwargs):
 
     LOG.info("output frame size: {}".format(output.shape))
     if not is_streaming:
-        output = output[:, :, ::-1]
-        output = cv2.imencode('.jpg', output)[1].tostring()
+        _, buf = cv2.imencode('.jpg', output[:, :, ::-1])
+        output = buf.tostring()
 
     return {'output': output}
