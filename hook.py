@@ -43,11 +43,14 @@ def process(inputs, ctx, **kwargs):
     if frame is None:
         raise RuntimeError("Unable to read frame")
 
+    LOG.info("input frame size:", frame.shape)
+
     network = ctx.global_ctx[0]
     styles = ctx.global_ctx[1]
     scale = 1.0
 
     frame = detect_align(frame)
+    LOG.info("aligned frame size:", frame.shape)
 
     if frame is None:
         output = np.zeros((256, 256, 1), dtype="uint8")
@@ -61,6 +64,7 @@ def process(inputs, ctx, **kwargs):
         output = network.generate_BA(images, scales, 16, styles=styles)
         output = 0.5*output + 0.5
 
+    LOG.info("output frame size:", frame.shape)
     if not is_streaming:
         output = output[:, :, ::-1]
         output = cv2.imencode('.jpg', output)[1].tostring()
