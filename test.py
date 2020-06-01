@@ -67,10 +67,12 @@ if __name__ == '__main__':
 
             output = process(network, frame_in, aligned=args.aligned, styles=styles, scale=args.scale)
             if output is None:
+                output = np.zeros((256, 256, 1), dtype="uint8")
                 print("skipped")
-                continue
+            else:
+                output = output[0]
 
-            cv2.imshow('webcam', output[0])
+            cv2.imshow('webcam', output)
 
             ch = 0xFF & cv2.waitKey(1)
             if ch in [27, ord('q')]:
@@ -82,8 +84,9 @@ if __name__ == '__main__':
 
         output = process(
             network, img,
-            aligned=args.aligned, styles=args.num_styles, scale=args.scale,
+            aligned=args.aligned, styles=styles, scale=args.scale,
         )
 
-        for i in range(args.num_styles):
-            imageio.imwrite(args.output + '_{}.jpg'.format(i), output[i])
+        if output is not None:
+            for i in range(args.num_styles):
+                imageio.imwrite(args.output + '_{}.jpg'.format(i), output[i])
