@@ -32,7 +32,11 @@ def init_and_load_model(model_dir):
     return network
 
 
-def process(network, img, aligned=False, styles=None, scale=1.):
+def get_styles(network, num_styles):
+    return np.random.normal(0., 1., (num_styles, network.input_style.shape[1].value))
+
+
+def process(network, img, aligned=False, num_styles=5, styles=None, scale=1.):
 
     if not aligned:
         img = detect_align(img)
@@ -43,6 +47,9 @@ def process(network, img, aligned=False, styles=None, scale=1.):
 
     images = np.tile(img[None], [num_styles, 1, 1, 1])
     scales = scale * np.ones((num_styles))
+
+    if styles is None:
+        styles = get_styles(network, num_styles)
 
     output = network.generate_BA(images, scales, 16, styles=styles)
     output = 0.5*output + 0.5
@@ -56,16 +63,19 @@ if __name__ == '__main__':
     network = init_and_load_model(args.model_dir)
     is_cam = args.input is None
     num_styles = 1 if is_cam else args.num_styles
-    styles = np.random.normal(0., 1., (num_styles, network.input_style.shape[1].value))
 
     if is_cam:
 
+        styles = get_styles(network, num_styles)
         cam = cv2.VideoCapture(0)
         while True:
             ret, frame_in = cam.read()
             frame_in = frame_in[:, :, ::-1]
 
-            output = process(network, frame_in, aligned=args.aligned, styles=styles, scale=args.scale)
+            output = process(
+                network, frame_in,
+                aligned=args.aligned, num_styles=num_styles, styles=styles, scale=args.scale,
+            )
             if output is None:
                 output = np.zeros((256, 256, 1), dtype="uint8")
                 print("skipped")
@@ -84,9 +94,9 @@ if __name__ == '__main__':
 
         output = process(
             network, img,
-            aligned=args.aligned, styles=styles, scale=args.scale,
+            aligned=args.aligned, num_styles=num_styles, scale=args.scale,
         )
 
         if output is not None:
-            for i in range(args.num_styles):
+            for i in range(num_styles):
                 imageio.imwrite(args.output + '_{}.jpg'.format(i), output[i])

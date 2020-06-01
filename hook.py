@@ -54,6 +54,7 @@ def process(inputs, ctx, **kwargs):
 
     if frame is None:
         output = np.zeros((256, 256, 1), dtype="uint8")
+        LOG.info("no aligned image")
 
     else:
         frame = (frame - 127.5) / 128.0
