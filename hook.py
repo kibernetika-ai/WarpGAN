@@ -67,6 +67,7 @@ def process(inputs, ctx, **kwargs):
         output = 0.5*output + 0.5
 
         output = output[0]
+        LOG.info(output)
 
     LOG.info("output frame size: {}".format(output.shape))
     if not is_streaming:
