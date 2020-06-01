@@ -37,6 +37,8 @@ def _build_pipe(ctx):
 
 def process(inputs, ctx, **kwargs):
 
+    LOG.info("process incoming")
+
     frame, is_streaming = helpers.load_image(inputs, 'input')
     if frame is None:
         raise RuntimeError("Unable to read frame")
