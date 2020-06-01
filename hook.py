@@ -66,8 +66,7 @@ def process(inputs, ctx, **kwargs):
         output = network.generate_BA(images, scales, 16, styles=styles)
         output = 0.5*output + 0.5
 
-        output = output[0]
-        LOG.info(output)
+        output = (output[0] * 256).astype('uint8')
 
     LOG.info("output frame size: {}".format(output.shape))
     if not is_streaming:
