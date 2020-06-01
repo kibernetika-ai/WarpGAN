@@ -58,9 +58,10 @@ def process(inputs, ctx, **kwargs):
 
     else:
         frame = (frame - 127.5) / 128.0
+        LOG.info("aligned image exists")
 
         images = np.tile(frame[None], [1, 1, 1, 1])
-        scales = scale * np.ones((1))
+        scales = scale * np.ones(1)
 
         output = network.generate_BA(images, scales, 16, styles=styles)
         output = 0.5*output + 0.5
